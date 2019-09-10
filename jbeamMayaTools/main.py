@@ -39,7 +39,7 @@ class JbeamUI(QtWidgets.QMainWindow):
         self.setObjectName(WINDOW_OBJECT)
         self.setWindowTitle(WINDOW_TITLE)
         self.setWindowFlags(QtCore.Qt.Window)
-        self.setMinimumSize(200, 200)
+        self.setMinimumSize(10, 10)
         self.setProperty("saveWindowPref", True)
 
         # Main widgets
