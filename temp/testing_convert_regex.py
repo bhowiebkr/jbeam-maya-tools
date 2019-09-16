@@ -67,9 +67,11 @@ def main():
         j = re.sub(
             r'("[a-zA-Z0-9_]+"):(\s*"[a-zA-Z0-9_]+:)(\n\s*"[a-zA-Z]+")', r'\1:\2",\n\3', j)
 
+        # Use this file to debug where the error happened on.
         with open('temp\\TEMP.json', 'w') as f:
             f.write(j)
 
+        # Try to read it as json
         try:
             test = json.loads(j)
             converted += 1
