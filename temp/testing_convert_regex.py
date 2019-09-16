@@ -6,19 +6,14 @@ import glob
 
 
 def main():
-
-    vehicle_path = 'C:\\temp\\all_jbeam'
-
-    invalid_files = 0
-    converted = 0
-
-    # Import the pc files
-    i = 0
+    vehicle_path = 'C:\\temp\\all_jbeam'  # dump of jbeam files
+    invalid_files = 0  # files unable to be converted
+    converted = 0  # converted files
+    i = 0  # current
     total = len(glob.glob(os.path.join(vehicle_path, '*.jbeam')))
+
+    # Loop over all jbeam files in vehicle path
     for jbeam_path in glob.glob(os.path.join(vehicle_path, '*.jbeam')):
-
-        # print('current:', jbeam_path, i)
-
         with open(jbeam_path, 'r') as f:
             j = f.read()
 
