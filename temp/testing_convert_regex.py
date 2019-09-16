@@ -9,8 +9,12 @@ def main():
 
     vehicle_path = 'C:\\temp\\all_jbeam'
 
+    invalid_files = 0
+    converted = 0
+
     # Import the pc files
     i = 0
+    total = len(glob.glob(os.path.join(vehicle_path, '*.jbeam')))
     for jbeam_path in glob.glob(os.path.join(vehicle_path, '*.jbeam')):
 
         # print('current:', jbeam_path, i)
@@ -64,17 +68,26 @@ def main():
         # missing comma between "bla""bla"
         j = re.sub(r'("[a-zA-Z0-9_]*")("[a-zA-Z0-9_]*")', r'\1, \2', j)
 
+        # missing quotation on value in "bla": "bla
+        j = re.sub(
+            r'("[a-zA-Z0-9_]+"):(\s*"[a-zA-Z0-9_]+:)(\n\s*"[a-zA-Z]+")', r'\1:\2",\n\3', j)
+
         with open('temp\\TEMP.json', 'w') as f:
             f.write(j)
 
         try:
             test = json.loads(j)
+            converted += 1
 
         except Exception as e:
-            print('\n', e, '\n', jbeam_path, '\n')
-            break
+            print('\n', e, '\n', jbeam_path,
+                  '\n\n{}/{}'.format(i, total))
+            invalid_files += 1
 
         i += 1
+
+    print('total: {}, converted: {}, invalid: {}'.format(
+        total, converted, invalid_files))
 
 
 if __name__ == '__main__':
