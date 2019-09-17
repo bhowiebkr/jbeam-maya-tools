@@ -64,9 +64,6 @@ def main():
         # Remove trailing comma
         j = re.sub(r',\s*?(]|})', r'\1', j)
 
-        # single line comments
-        j = re.sub(r'\/\/.*', r'', j)
-
         # add comma between numbers with spaces ie: 333 333 = 333, 333
         j = re.sub(r'(-?[0-9])\s+(-?[0-9])', r'\1,\2', j)
 
