@@ -4,7 +4,6 @@ import os
 import json
 import glob
 
-# skip_files = ['etk800', 'etk800_body_wagon', 'etkc', 'sbr_electric']
 skip_files = []
 
 
@@ -30,11 +29,9 @@ def main():
         if skip:
             continue
 
-        # single line comments
-        j = re.sub(r'\/\/.*', r'', j)
-
-        # multiline comments
-        j = re.sub(r'/\*[\s\S]*?\*/', '', j)
+        # Comments
+        j = re.sub(r'\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$',
+                   r'\1', j, flags=re.MULTILINE)
 
         # Missing comma between brackets
         j = re.sub(r'(\]|})\s*?(\{|\[)', r'\1,\2', j)
@@ -77,9 +74,6 @@ def main():
         j = re.sub(
             r'("[a-zA-Z0-9_]+"):(\s*"[a-zA-Z0-9_]+:)(\n\s*"[a-zA-Z]+")', r'\1:\2",\n\3', j)
 
-        # Find line with missing and incorrect ending brackets. exp below is starting place
-        # (^\s*.*,\s"[a-zA-Z_]+"\s?:\s?"[a-zA-Z_]+:$)
-
         # missing comma after bool "bla":false"bla" = "bla":false, "bla"
         j = re.sub(r':(false|true)("[a-zA-Z_]+")', r':\1, \2', j)
 
@@ -89,10 +83,6 @@ def main():
         # missing number after decimal point
         j = re.sub(r'("[a-zA-Z0-9]+"):(-?[0-9])\.,\s?"', r'\1:\2.0,"', j)
 
-        # Use this file to debug where the error happened on.
-        with open('temp\\TEMP.json', 'w') as f:
-            f.write(j)
-
         # remove junk at the end of file
         if j.endswith(','):
             j = j[:-1]
@@ -100,6 +90,10 @@ def main():
         # try to fix extra brackets at the end of file
         if not j.count('{') == j.count('}'):
             j = j[:-1]
+
+        # Use this file to debug where the error happened on.
+        with open('temp\\TEMP.json', 'w') as f:
+            f.write(j)
 
         # Try to read it as json
         try:
