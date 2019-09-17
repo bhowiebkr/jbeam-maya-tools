@@ -4,6 +4,9 @@ import os
 import json
 import glob
 
+# skip_files = ['etk800', 'etk800_body_wagon', 'etkc', 'sbr_electric']
+skip_files = []
+
 
 def main():
     vehicle_path = 'C:\\temp\\all_jbeam'  # dump of jbeam files
@@ -16,6 +19,16 @@ def main():
     for jbeam_path in glob.glob(os.path.join(vehicle_path, '*.jbeam')):
         with open(jbeam_path, 'r') as f:
             j = f.read()
+
+        name = os.path.basename(jbeam_path).split('.')[0]
+
+        skip = False
+        for s in skip_files:
+            if s == name:
+                skip = True
+
+        if skip:
+            continue
 
         # single line comments
         j = re.sub(r'\/\/.*', r'', j)
@@ -55,7 +68,7 @@ def main():
         j = re.sub(r'\/\/.*', r'', j)
 
         # add comma between numbers with spaces ie: 333 333 = 333, 333
-        j = re.sub(r'([0-9])\s+([0-9])', r'\1,\2', j)
+        j = re.sub(r'(-?[0-9])\s+(-?[0-9])', r'\1,\2', j)
 
         # Add comma between number and "
         j = re.sub(r'([0-9])\s*("[a-zA-Z0-9_]*")', r'\1, \2', j)
@@ -67,9 +80,29 @@ def main():
         j = re.sub(
             r'("[a-zA-Z0-9_]+"):(\s*"[a-zA-Z0-9_]+:)(\n\s*"[a-zA-Z]+")', r'\1:\2",\n\3', j)
 
+        # Find line with missing and incorrect ending brackets. exp below is starting place
+        # (^\s*.*,\s"[a-zA-Z_]+"\s?:\s?"[a-zA-Z_]+:$)
+
+        # missing comma after bool "bla":false"bla" = "bla":false, "bla"
+        j = re.sub(r':(false|true)("[a-zA-Z_]+")', r':\1, \2', j)
+
+        # edge case of missing comma inside of list
+        j = re.sub(r'(["[a-zA-Z_0-9.?]+")\s(\["[a-zA-Z_]+"\]])', r'\1, \2', j)
+
+        # missing number after decimal point
+        j = re.sub(r'("[a-zA-Z0-9]+"):(-?[0-9])\.,\s?"', r'\1:\2.0,"', j)
+
         # Use this file to debug where the error happened on.
         with open('temp\\TEMP.json', 'w') as f:
             f.write(j)
+
+        # remove junk at the end of file
+        if j.endswith(','):
+            j = j[:-1]
+
+        # try to fix extra brackets at the end of file
+        if not j.count('{') == j.count('}'):
+            j = j[:-1]
 
         # Try to read it as json
         try:
@@ -77,9 +110,10 @@ def main():
             converted += 1
 
         except Exception as e:
-            print('\n', e, '\n', jbeam_path,
+            print('\n', e, '\n', name,
                   '\n\n{}/{}'.format(i, total))
             invalid_files += 1
+            continue
 
         i += 1
 
