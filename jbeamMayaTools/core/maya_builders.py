@@ -19,12 +19,19 @@ def make_groups(car_name):
     return group, nodes_group, beams_group
 
 
-def make_node(name, parent, vtx):
+def make_node(name, parent, point=None, vtx=None):
     """Make a Node from a vertex location
     """
+    if pm.objExists(name):
+        return
+
     loc = pm.spaceLocator()
     loc.rename(name)
-    loc.t.set(vtx.getPosition(space='world'))
+
+    if point:
+        loc.t.set([point[0]*100, point[2]*100, point[1]*-100])
+    elif vtx:
+        loc.t.set(vtx.getPosition(space='world'))
     loc.overrideEnabled.set(True)
     loc.overrideColor.set(17)
     loc.setParent(parent)
@@ -40,8 +47,8 @@ def make_beam(index, c, group):
     curve.overrideColor.set(15)
     lock_hide(curve)
 
-    start = pm.DependNode('b' + str(c[0]))
-    end = pm.DependNode('b' + str(c[1]))
+    start = pm.DependNode(str(c[0]))
+    end = pm.DependNode(str(c[1]))
 
     start.t >> shape.controlPoints[0]
     end.t >> shape.controlPoints[1]
