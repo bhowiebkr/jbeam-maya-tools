@@ -4,7 +4,8 @@ import os
 
 from jbeamMayaTools.core.Vehicle import Vehicle
 from jbeamMayaTools.core.maya_builders import build_truss
-import jbeamMayaTools.core.jbeam_import as jbeam_import
+from jbeamMayaTools.core import jbeam_import
+# from jbeamMayaTools.core import jbeam_import
 
 CAR_NAME = 'howiezoom'
 ROOT_PATH = os.path.abspath(__file__ + '/../../../')
