@@ -31,7 +31,7 @@ def main():
 
         # Comments
         j = re.sub(r'\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$',
-                   r'\1', j, flags=re.MULTILINE)
+                   lambda m: m.group(1) or '', j, flags=re.MULTILINE)
 
         # Missing comma between brackets
         j = re.sub(r'(\]|})\s*?(\{|\[)', r'\1,\2', j)
@@ -92,7 +92,7 @@ def main():
             j = j[:-1]
 
         # Use this file to debug where the error happened on.
-        with open('temp\\TEMP.json', 'w') as f:
+        with open(r'C:\workarea\jbeam-maya-tools\temp\TEMP.json', 'w') as f:
             f.write(j)
 
         # Try to read it as json
@@ -104,7 +104,7 @@ def main():
             print('\n', e, '\n', name,
                   '\n\n{}/{}'.format(i, total))
             invalid_files += 1
-            continue
+            break
 
         i += 1
 
